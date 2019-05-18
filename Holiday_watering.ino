@@ -45,7 +45,7 @@ void setup() {
   wmm.setup(__SKETCH_NAME__);
 
   // optional - define a callback to handle incoming messages from MQTT
-  wmm.client->setCallback(subscriptionCallback);
+  //wmm.client->setCallback(subscriptionCallback);
 
   // Initialize pump
   pumpONtime = 0;
@@ -143,7 +143,7 @@ void loop() {
   }
 }
 
-// optional function to process MQTT subscribed to topics coming in
+// subscription callback routine is registered by WiFiMQTTManager
 void subscriptionCallback(char* topic, byte* message, unsigned int length) {
   Serial.print(F("Message arrived on topic: "));
   Serial.println(topic);
