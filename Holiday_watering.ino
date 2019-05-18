@@ -4,8 +4,8 @@
 #include  <WiFiMQTTManager.h>
 #include <neotimer.h>
 
-// Button that will put device into Access Point mode to allow for re-entering WiFi and MQTT settings
-#define RESET_BUTTON  0
+//  Button that will put device into Access Point mode to allow for re-entering WiFi and MQTT settings
+#define RESET_BUTTON  12
 #define SOIL_EN_PIN   5
 #define PUMP_PIN      4
 #define DHT_PIN       16
@@ -26,10 +26,9 @@ boolean pumpON;
 boolean relayON;
 
 // heartbeat stuf
-long heartBeatArray[] = {
-    50, 100, 15, 1200};
-unsigned int hbeatIndex = 1;    // this initialization is not important
-long hbeatPrevMillis;
+long heartBeatArray[] = {50, 100, 15, 1200};
+unsigned int hbeatIndex = 1;
+long hbeatPrevMillis = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -80,12 +79,12 @@ void loop() {
   if (digitalRead(RELAY_PIN) == LOW) {
     if (!relayON) {
       relayON = true;
-      publish2mqtt("sensor/"+ String(wmm.friendly_name)+"/relay","ON");
+      publish2mqtt("relay","ON");
     }
   } else {
     if (relayON) {
       relayON = false;
-      publish2mqtt("sensor/"+ String(wmm.friendly_name)+"/relay","OFF");
+      publish2mqtt("relay","OFF");
     }
   }
   // read sensors every second (change it to minute)
@@ -100,87 +99,92 @@ void loop() {
     moistWarmUpTimer.start();
 
     // read DHT22
-    String  dhtstatus = dht.getStatusString();
-    float humidity = dht.getHumidity();
-    float temperature = dht.getTemperature();
-    Serial.println("DHT22 [status/humidity/temperature]: "+dhtstatus+"/"+String(humidity,2)+"/"+String(temperature,2));
-    publish2mqtt("sensor/"+ String(wmm.friendly_name)+"/dhtstatus",String(dhtstatus));
-    publish2mqtt("sensor/"+ String(wmm.friendly_name)+"/humidity",String(humidity,2));
-    publish2mqtt("sensor/"+ String(wmm.friendly_name)+"/temperature",String(temperature,2));
+    Serial.println(F("Publish DHT readings"));
+    char c_tmp[10];
+    publish2mqtt("status",dht.getStatusString());
+    snprintf(c_tmp,sizeof(c_tmp),"%.2f",dht.getHumidity());
+    publish2mqtt("humidity",c_tmp);
+    snprintf(c_tmp,sizeof(c_tmp),"%.2f",dht.getTemperature());
+    publish2mqtt("temperature",c_tmp);
   }
 
   // Check capacitive soil moist sensor
   if(moistWarmUpTimer.done()){
+      // Stop the warm-up timer
+      moistWarmUpTimer.stop();
+
       // read soil moist sensor
       unsigned int moist = analogRead(A0);
       delay(10); // double take readings
       moist += analogRead(A0);
+
       // power down to prevent corosion
       digitalWrite(SOIL_EN_PIN,LOW);
       moist /= 2;
 
-      Serial.println("Soil moist: "+String(moist,DEC));
-	    publish2mqtt("sensor/"+ String(wmm.friendly_name)+"/moist",String(moist,DEC));
-      moistWarmUpTimer.stop();
+      Serial.println(F("Publish soil moist reading:"));
+      char c_tmp[10];
+      snprintf(c_tmp,sizeof(c_tmp),"%d",moist);
+	  publish2mqtt("moist",c_tmp);
   }
 
   // turn ON/OFF the water pump
   if (pumpON && (now - pumpStartTime > pumpONtime)) {
     pumpON = false;
     pumpONtime = 0;
-    Serial.println("turn the pump OFF at "+String(now,DEC));
+    Serial.println(F("turn the pump OFF"));
     digitalWrite(PUMP_PIN,LOW);
   }
   if (!pumpON && (pumpONtime > 1000)) {
     pumpON = true;
     pumpStartTime = now;
-    Serial.println("turn the pump ON at "+String(pumpStartTime,DEC));
+    Serial.println(F("turn the pump ON"));
     digitalWrite(PUMP_PIN,HIGH);
   }
-
-}
-
-// optional function to subscribe to MQTT topics
-void subscribeTo() {
-  Serial.println(F("subscribing to some topics..."));
-  // subscribe to some topic(s)
-  char topic[30];
-  snprintf(topic, sizeof(topic), "%s%s%s", "switch/", wmm.friendly_name, "/pump");
-  wmm.client->subscribe(topic);
-//  delete [] topic;
 }
 
 // optional function to process MQTT subscribed to topics coming in
 void subscriptionCallback(char* topic, byte* message, unsigned int length) {
   Serial.print(F("Message arrived on topic: "));
-  Serial.print(topic);
+  Serial.println(topic);
   Serial.print(F(" Payload: "));
-  String msg;
-//  msg.reserve(length+1);
+  char c_tmp[10];
+  strncpy(c_tmp,(char *)message,length);
+  Serial.println(c_tmp);
 
-  for (int i = 0; i < length; i++) {
-//    Serial.print((char)message[i]);
-    msg += (char)message[i];
-  }
-  Serial.println(msg);
-  pumpONtime = msg.toInt() * 1000;
-  Serial.println("Setting pumpONtime to: "+String(pumpONtime,DEC));
+  // no need to check topic as it is the only one :-)
+  pumpONtime = atoi(c_tmp) * 1000;
 } // subscriptionCallback()
 
-void publish2mqtt(String topic, String payload){
-      wmm.client->publish(topic.c_str(), payload.c_str(), false);
-      Serial.println("publish --> "+topic+" "+payload);
+// optional function to subscribe to MQTT topics
+void subscribeTo() {
+  Serial.println(F("subscribing to pump switch"));
+  char topic[30];
+  snprintf(topic, sizeof(topic), "%s%s%s", "switch/", wmm.friendlyName, "/pump");
+  wmm.client->subscribe(topic);
+}
+
+
+void publish2mqtt(const char* topic, const char* payload){
+      char c_tmp[100];
+      strcpy(c_tmp,"sensor/");
+      strcat(c_tmp,wmm.friendlyName);
+      strcat(c_tmp,"/");
+      strcat(c_tmp,topic);
+      Serial.print(c_tmp);
+      Serial.print(" ");
+      Serial.println(payload);
+      wmm.client->publish(c_tmp, payload);
 }
 
 void heartBeat(float tempo){
-    if ((millis() - hbeatPrevMillis) > (long)(heartBeatArray[hbeatIndex] * tempo)){
+    if ((millis() - hbeatPrevMillis) > (long)(heartBeatArray[hbeatIndex] * tempo)) {
         hbeatIndex++;
         if (hbeatIndex > 3) hbeatIndex = 0;
 
         if ((hbeatIndex % 2) == 0){     // modulo 2 operator will be true on even counts
             digitalWrite(LED_BUILTIN, LOW);
-        }
-        else{
+        } else {
             digitalWrite(LED_BUILTIN, HIGH);
         }
         //  Serial.println(hbeatIndex);

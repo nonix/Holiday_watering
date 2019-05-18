@@ -2,14 +2,14 @@
   "id": "d011e418.3e4ce8",
   "type": "tab",
   "label": "Watering",
-  "disabled": false,
+  "disabled": true,
   "info": ""
 }, {
   "id": "a625b7a5.9d071",
   "type": "bigtimer",
   "z": "d011e418.3e4ce8",
   "outtopic": "switch/Watering/pump",
-  "outpayload1": "20",
+  "outpayload1": "1200",
   "outpayload2": "0",
   "name": "Watering timer",
   "comment": "",
@@ -100,11 +100,11 @@
   "atstart": false,
   "odd": false,
   "even": false,
-  "x": 460,
-  "y": 460,
+  "x": 440,
+  "y": 280,
   "wires": [
-    ["885e3b.9c6e91c8", "35c89fac.c1ecb"],
-    ["d03d98b6.aed2"],
+    ["885e3b.9c6e91c8"],
+    ["d03d98b6.aed2", "479126f4.c2bb88"],
     ["439720a4.e86078"]
   ]
 }, {
@@ -113,40 +113,12 @@
   "z": "d011e418.3e4ce8",
   "name": "",
   "topic": "switch/Watering/pump",
-  "qos": "2",
+  "qos": "0",
   "retain": "false",
   "broker": "243fb1ae.c79226",
-  "x": 780,
-  "y": 340,
-  "wires": []
-}, {
-  "id": "66a36cc6.caf414",
-  "type": "ui_text",
-  "z": "d011e418.3e4ce8",
-  "group": "31dbe66f.a1c39a",
-  "order": 1,
-  "width": 0,
-  "height": 0,
-  "name": "",
-  "label": "LED1",
-  "format": "<font color={{msg.color}} ><i class=\"fa fa-circle\" style=\"font-size:24px;\"></i></font>",
-  "layout": "col-center",
-  "x": 910,
-  "y": 100,
-  "wires": []
-}, {
-  "id": "35c89fac.c1ecb",
-  "type": "function",
-  "z": "d011e418.3e4ce8",
-  "name": "set color",
-  "func": "msg.color = (msg.payload > 0)?\"lime\":\"gray\";\nreturn msg;",
-  "outputs": 1,
-  "noerr": 0,
   "x": 740,
   "y": 100,
-  "wires": [
-    ["66a36cc6.caf414"]
-  ]
+  "wires": []
 }, {
   "id": "4217278f.81ea9",
   "type": "ui_gauge",
@@ -165,8 +137,8 @@
   "colors": ["#00b500", "#e6e600", "#ca3838"],
   "seg1": "",
   "seg2": "",
-  "x": 470,
-  "y": 40,
+  "x": 1110,
+  "y": 260,
   "wires": []
 }, {
   "id": "163a90f1.4affd7",
@@ -179,15 +151,15 @@
   "height": 0,
   "passthru": false,
   "label": "refil",
-  "tooltip": "Press when Barel was filled up",
+  "tooltip": "Press after Barel refil",
   "color": "white",
   "bgcolor": "blue",
   "icon": "",
   "payload": "50",
   "payloadType": "num",
   "topic": "refil",
-  "x": 120,
-  "y": 100,
+  "x": 690,
+  "y": 220,
   "wires": [
     ["d03d98b6.aed2"]
   ]
@@ -196,53 +168,13 @@
   "type": "function",
   "z": "d011e418.3e4ce8",
   "name": "water counter",
-  "func": "var count=context.get('count') || 0;\nif (msg.topic == \"refil\") {\n    count=msg.payload;\n} else {\n    count -= msg.payload*1;\n    count=(count < 0)?0:count;\n}\nmsg.payload=count;\ncontext.set('count',count);\nreturn msg;",
+  "func": "var count=context.get('count') || 0;\nif (msg.topic == \"refil\") {\n    count=msg.payload;\n} else {\n    count -= msg.payload*0.1;\n    count=(count < 0)?0:count;\n}\nmsg.payload=count;\ncontext.set('count',count);\nreturn msg;",
   "outputs": 1,
   "noerr": 0,
-  "x": 320,
-  "y": 140,
+  "x": 920,
+  "y": 260,
   "wires": [
     ["4217278f.81ea9"]
-  ]
-}, {
-  "id": "3c1642ab.5ef6d6",
-  "type": "inject",
-  "z": "d011e418.3e4ce8",
-  "name": "manual inject",
-  "topic": "switch/Watering/pump",
-  "payload": "1",
-  "payloadType": "str",
-  "repeat": "",
-  "crontab": "",
-  "once": false,
-  "onceDelay": 0.1,
-  "x": 170,
-  "y": 460,
-  "wires": [
-    ["a625b7a5.9d071"]
-  ]
-}, {
-  "id": "b3133c55.07557",
-  "type": "ui_button",
-  "z": "d011e418.3e4ce8",
-  "name": "",
-  "group": "31dbe66f.a1c39a",
-  "order": 3,
-  "width": 0,
-  "height": 0,
-  "passthru": true,
-  "label": "TurnON for 2 minutes",
-  "tooltip": "Force watering for 2 minutes",
-  "color": "red",
-  "bgcolor": "green",
-  "icon": "",
-  "payload": "1",
-  "payloadType": "str",
-  "topic": "switch/Watering/pump",
-  "x": 330,
-  "y": 360,
-  "wires": [
-    ["a625b7a5.9d071"]
   ]
 }, {
   "id": "b4598f24.9ac8d8",
@@ -254,7 +186,7 @@
   "width": 0,
   "height": 0,
   "gtype": "gage",
-  "title": "soil Moisture",
+  "title": "soil moisture",
   "label": "%",
   "format": "{{value}}",
   "min": "0",
@@ -262,8 +194,8 @@
   "colors": ["#0000ff", "#00ac00", "#ff0000"],
   "seg1": "",
   "seg2": "",
-  "x": 470,
-  "y": 560,
+  "x": 690,
+  "y": 500,
   "wires": []
 }, {
   "id": "325c3539.b4cae2",
@@ -275,9 +207,9 @@
   "datatype": "auto",
   "broker": "243fb1ae.c79226",
   "x": 130,
-  "y": 560,
+  "y": 500,
   "wires": [
-    ["cdde0d35.103b5"]
+    ["4d1c1ceb.45727c"]
   ]
 }, {
   "id": "ba25aa70.86d048",
@@ -288,10 +220,10 @@
   "qos": "2",
   "datatype": "auto",
   "broker": "243fb1ae.c79226",
-  "x": 160,
-  "y": 660,
+  "x": 150,
+  "y": 620,
   "wires": [
-    ["7647e839.b279c8", "ef47511c.ec8f28"]
+    ["7647e839.b279c8", "b0fe9911.1b5b08"]
   ]
 }, {
   "id": "7647e839.b279c8",
@@ -299,7 +231,7 @@
   "z": "d011e418.3e4ce8",
   "name": "",
   "group": "fa8a91cd.256f3",
-  "order": 1,
+  "order": 2,
   "width": 0,
   "height": 0,
   "label": "temperature",
@@ -319,26 +251,11 @@
   "colors": ["#1f77b4", "#aec7e8", "#ff7f0e", "#2ca02c", "#98df8a", "#d62728", "#ff9896", "#9467bd", "#c5b0d5"],
   "useOldStyle": false,
   "outputs": 1,
-  "x": 510,
-  "y": 660,
+  "x": 710,
+  "y": 620,
   "wires": [
     []
   ]
-}, {
-  "id": "ef47511c.ec8f28",
-  "type": "ui_text",
-  "z": "d011e418.3e4ce8",
-  "group": "fa8a91cd.256f3",
-  "order": 2,
-  "width": 0,
-  "height": 0,
-  "name": "",
-  "label": "current Temperature:",
-  "format": "{{msg.payload}}",
-  "layout": "row-center",
-  "x": 550,
-  "y": 780,
-  "wires": []
 }, {
   "id": "8de67daf.f80e68",
   "type": "mqtt in",
@@ -348,8 +265,8 @@
   "qos": "2",
   "datatype": "auto",
   "broker": "243fb1ae.c79226",
-  "x": 190,
-  "y": 840,
+  "x": 140,
+  "y": 740,
   "wires": [
     ["6a24247.046025c"]
   ]
@@ -359,7 +276,7 @@
   "z": "d011e418.3e4ce8",
   "name": "current Humidity",
   "group": "fa8a91cd.256f3",
-  "order": 3,
+  "order": 6,
   "width": 0,
   "height": 0,
   "gtype": "gage",
@@ -371,23 +288,23 @@
   "colors": ["#ff0000", "#00bd00", "#0080ff"],
   "seg1": "",
   "seg2": "",
-  "x": 550,
-  "y": 840,
+  "x": 730,
+  "y": 740,
   "wires": []
 }, {
   "id": "cdde0d35.103b5",
   "type": "range",
   "z": "d011e418.3e4ce8",
-  "minin": "442",
-  "maxin": "820",
-  "minout": "0",
+  "minin": "430",
+  "maxin": "816",
+  "minout": "2",
   "maxout": "100",
   "action": "clamp",
   "round": true,
   "property": "payload",
   "name": "moist2percent",
-  "x": 310,
-  "y": 600,
+  "x": 480,
+  "y": 500,
   "wires": [
     ["b4598f24.9ac8d8"]
   ]
@@ -403,16 +320,16 @@
   "label": "",
   "format": "{{msg.payload}}",
   "layout": "col-center",
-  "x": 1130,
-  "y": 460,
+  "x": 1110,
+  "y": 360,
   "wires": []
 }, {
   "id": "439720a4.e86078",
   "type": "simpletime",
   "z": "d011e418.3e4ce8",
   "name": "",
-  "x": 750,
-  "y": 460,
+  "x": 710,
+  "y": 360,
   "wires": [
     ["6b35723a.7331b4"]
   ]
@@ -433,10 +350,234 @@
   "from": "",
   "to": "",
   "reg": false,
-  "x": 950,
-  "y": 460,
+  "x": 910,
+  "y": 360,
   "wires": [
     ["8a6f579b.8eca18"]
+  ]
+}, {
+  "id": "5354ebf2.741cac",
+  "type": "ui_switch",
+  "z": "d011e418.3e4ce8",
+  "name": "Manual override",
+  "label": "Manual On/Off",
+  "tooltip": "",
+  "group": "31dbe66f.a1c39a",
+  "order": 5,
+  "width": 0,
+  "height": 0,
+  "passthru": true,
+  "decouple": "false",
+  "topic": "switch/Watering/pump",
+  "style": "",
+  "onvalue": "on",
+  "onvalueType": "str",
+  "onicon": "",
+  "oncolor": "",
+  "offvalue": "default",
+  "offvalueType": "str",
+  "officon": "",
+  "offcolor": "",
+  "x": 140,
+  "y": 280,
+  "wires": [
+    ["a625b7a5.9d071"]
+  ]
+}, {
+  "id": "479126f4.c2bb88",
+  "type": "debug",
+  "z": "d011e418.3e4ce8",
+  "name": "",
+  "active": true,
+  "tosidebar": true,
+  "console": false,
+  "tostatus": false,
+  "complete": "true",
+  "targetType": "full",
+  "x": 690,
+  "y": 300,
+  "wires": []
+}, {
+  "id": "273e85cb.c5822a",
+  "type": "comment",
+  "z": "d011e418.3e4ce8",
+  "name": "Sensors",
+  "info": "",
+  "x": 120,
+  "y": 460,
+  "wires": []
+}, {
+  "id": "867c63fc.5f2dc",
+  "type": "comment",
+  "z": "d011e418.3e4ce8",
+  "name": "Main",
+  "info": "",
+  "x": 110,
+  "y": 60,
+  "wires": []
+}, {
+  "id": "4aa2af67.9183f8",
+  "type": "ui_text",
+  "z": "d011e418.3e4ce8",
+  "group": "fa8a91cd.256f3",
+  "order": 5,
+  "width": 0,
+  "height": 0,
+  "name": "",
+  "label": "DHT Status",
+  "format": "<font color={{msg.color}} ><i class=\"fa fa-circle\" style=\"font-size:24px;\"></i></font>",
+  "layout": "row-center",
+  "x": 790,
+  "y": 820,
+  "wires": [],
+  "icon": "node-red-contrib-ui-led/led.png"
+}, {
+  "id": "f721ae3a.eae6d8",
+  "type": "function",
+  "z": "d011e418.3e4ce8",
+  "name": "set color of status",
+  "func": "switch(msg.payload) {\n  case \"OK\":\n    // Glow GREEN\n    msg.color = \"lime\";\n    break;\n  default:\n    // Glow RED\n    msg.color = \"red\";\n} \n\nreturn msg;",
+  "outputs": 1,
+  "noerr": 0,
+  "x": 570,
+  "y": 820,
+  "wires": [
+    ["4aa2af67.9183f8"]
+  ]
+}, {
+  "id": "17298580.81ba8b",
+  "type": "mqtt in",
+  "z": "d011e418.3e4ce8",
+  "name": "DHT_status",
+  "topic": "sensor/Watering/status",
+  "qos": "0",
+  "datatype": "utf8",
+  "broker": "243fb1ae.c79226",
+  "x": 130,
+  "y": 820,
+  "wires": [
+    ["e6b95fa0.972388"]
+  ]
+}, {
+  "id": "4d1c1ceb.45727c",
+  "type": "timeouttrigger",
+  "z": "d011e418.3e4ce8",
+  "ontimeouttype": "num",
+  "ontimeoutval": "-1",
+  "duration": "70",
+  "units": "s",
+  "name": "WDT",
+  "x": 280,
+  "y": 500,
+  "wires": [
+    ["cdde0d35.103b5", "5eb0b8f0.ab6f3"]
+  ]
+}, {
+  "id": "a7b76f50.bc5768",
+  "type": "ui_text",
+  "z": "d011e418.3e4ce8",
+  "group": "fa8a91cd.256f3",
+  "order": 3,
+  "width": 0,
+  "height": 0,
+  "name": "",
+  "label": "moist Status",
+  "format": "<font color={{msg.color}} ><i class=\"fa fa-circle\" style=\"font-size:24px;\"></i></font>",
+  "layout": "row-center",
+  "x": 710,
+  "y": 560,
+  "wires": [],
+  "icon": "node-red-contrib-ui-led/led.png"
+}, {
+  "id": "5eb0b8f0.ab6f3",
+  "type": "function",
+  "z": "d011e418.3e4ce8",
+  "name": "set color of moist",
+  "func": "switch(msg.payload) {\n  case -1:\n    // Glow RED\n    msg.color = \"red\";\n    break;\n  default:\n    // Glow GREEN\n    msg.color = \"lime\";\n} \n\nreturn msg;",
+  "outputs": 1,
+  "noerr": 0,
+  "x": 490,
+  "y": 560,
+  "wires": [
+    ["a7b76f50.bc5768"]
+  ]
+}, {
+  "id": "e6b95fa0.972388",
+  "type": "timeouttrigger",
+  "z": "d011e418.3e4ce8",
+  "ontimeouttype": "str",
+  "ontimeoutval": "TMOUT",
+  "duration": "70",
+  "units": "s",
+  "name": "DHT WDT",
+  "x": 320,
+  "y": 820,
+  "wires": [
+    ["f721ae3a.eae6d8"]
+  ]
+}, {
+  "id": "b0fe9911.1b5b08",
+  "type": "ui_gauge",
+  "z": "d011e418.3e4ce8",
+  "name": "current Temperature",
+  "group": "fa8a91cd.256f3",
+  "order": 5,
+  "width": 0,
+  "height": 0,
+  "gtype": "gage",
+  "title": "Temperature",
+  "label": "°C",
+  "format": "{{value}}",
+  "min": 0,
+  "max": "40",
+  "colors": ["#0000ff", "#00ac00", "#ff0000"],
+  "seg1": "",
+  "seg2": "",
+  "x": 740,
+  "y": 680,
+  "wires": []
+}, {
+  "id": "17d80316.655ac5",
+  "type": "mqtt in",
+  "z": "d011e418.3e4ce8",
+  "name": "Status of relay",
+  "topic": "sensor/Watering/relay",
+  "qos": "0",
+  "datatype": "utf8",
+  "broker": "243fb1ae.c79226",
+  "x": 140,
+  "y": 400,
+  "wires": [
+    ["764e7e21.d4bc3"]
+  ]
+}, {
+  "id": "44f20127.317d8",
+  "type": "ui_text",
+  "z": "d011e418.3e4ce8",
+  "group": "31dbe66f.a1c39a",
+  "order": 3,
+  "width": 0,
+  "height": 0,
+  "name": "",
+  "label": "Relay",
+  "format": "<font color={{msg.color}} ><i class=\"fa fa-circle\" style=\"font-size:24px;\"></i></font>",
+  "layout": "row-left",
+  "x": 760,
+  "y": 400,
+  "wires": [],
+  "icon": "node-red-contrib-ui-led/led.png"
+}, {
+  "id": "764e7e21.d4bc3",
+  "type": "function",
+  "z": "d011e418.3e4ce8",
+  "name": "set color of status",
+  "func": "switch(msg.payload) {\n  case \"ON\":\n    // Glow GREEN\n    msg.color = \"lime\";\n    break;\n  default:\n    // Glow RED\n    msg.color = \"gray\";\n} \n\nreturn msg;",
+  "outputs": 1,
+  "noerr": 0,
+  "x": 560,
+  "y": 400,
+  "wires": [
+    ["44f20127.317d8"]
   ]
 }, {
   "id": "243fb1ae.c79226",
@@ -447,7 +588,7 @@
   "port": "1883",
   "clientid": "",
   "usetls": false,
-  "compatmode": false,
+  "compatmode": true,
   "keepalive": "60",
   "cleansession": true,
   "birthTopic": "",
@@ -482,7 +623,7 @@
   "type": "ui_tab",
   "z": "",
   "name": "Watering",
-  "icon": "waves",
+  "icon": "fa-tint",
   "disabled": false,
   "hidden": false
 }]
