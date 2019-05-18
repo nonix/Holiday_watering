@@ -150,6 +150,7 @@ void subscriptionCallback(char* topic, byte* message, unsigned int length) {
   Serial.print(F(" Payload: "));
   char c_tmp[10];
   strncpy(c_tmp,(char *)message,length);
+  c_tmp[length] = '\0';
   Serial.println(c_tmp);
 
   // no need to check topic as it is the only one :-)
