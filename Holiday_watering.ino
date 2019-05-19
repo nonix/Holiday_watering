@@ -9,7 +9,13 @@
 #define SOIL_EN_PIN   5
 #define PUMP_PIN      4
 #define DHT_PIN       16
-#define RELAY_PIN     14
+
+#define DEBUG
+
+#ifdef DEBUG
+#define RELAY_STATUS_PIN     14
+boolean relayON;
+#endif
 
 // warmUp timer, it takes about 300ms to powerup the
 // Soil moist capacitive sensor
@@ -23,7 +29,6 @@ WiFiMQTTManager wmm(RESET_BUTTON, AP_PASSWORD);  // AP_PASSWORD is defined in th
 unsigned long pumpStartTime;
 volatile unsigned long pumpONtime;
 boolean pumpON;
-boolean relayON;
 
 // heartbeat stuf
 long heartBeatArray[] = {50, 100, 15, 1200};
@@ -50,10 +55,12 @@ void setup() {
   // Initialize pump
   pumpONtime = 0;
   pumpON = false;
-  relayON = false;
   pinMode(PUMP_PIN,OUTPUT);
   digitalWrite(PUMP_PIN,LOW);
-  pinMode(RELAY_PIN,INPUT_PULLUP);
+#ifdef DEBUG
+  relayON = false;
+  pinMode(RELAY_STATUS_PIN,INPUT);
+#endif
   dbTimer.start();
 
   // Turn LED off
@@ -75,8 +82,8 @@ void loop() {
   wmm.loop();
 
   heartBeat(1.5);
-
-  if (digitalRead(RELAY_PIN) == LOW) {
+#ifdef DEBUG
+  if (digitalRead(RELAY_STATUS_PIN) == HIGH) {
     if (!relayON) {
       relayON = true;
       publish2mqtt("relay","ON");
@@ -87,6 +94,7 @@ void loop() {
       publish2mqtt("relay","OFF");
     }
   }
+#endif
   // read sensors every second (change it to minute)
   unsigned long now = millis();
   if (now - wmm.lastMsg > 60000) {
