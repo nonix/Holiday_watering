@@ -2,17 +2,17 @@
   "id": "d011e418.3e4ce8",
   "type": "tab",
   "label": "Watering",
-  "disabled": true,
+  "disabled": false,
   "info": ""
 }, {
   "id": "a625b7a5.9d071",
   "type": "bigtimer",
   "z": "d011e418.3e4ce8",
-  "outtopic": "switch/Watering/pump",
-  "outpayload1": "1200",
+  "outtopic": "",
+  "outpayload1": "480",
   "outpayload2": "0",
   "name": "Watering timer",
-  "comment": "",
+  "comment": "ON time in seconds",
   "lat": "47.27",
   "lon": "8.26",
   "starttime": "5004",
@@ -24,8 +24,8 @@
   "startoff2": 0,
   "endoff2": 0,
   "offs": 0,
-  "outtext1": "watering now",
-  "outtext2": "last watering",
+  "outtext1": "drip ON",
+  "outtext2": "drip OFF",
   "timeout": "10",
   "sun": true,
   "mon": true,
@@ -100,12 +100,12 @@
   "atstart": false,
   "odd": false,
   "even": false,
-  "x": 440,
-  "y": 280,
+  "x": 520,
+  "y": 260,
   "wires": [
     ["885e3b.9c6e91c8"],
-    ["d03d98b6.aed2", "479126f4.c2bb88"],
-    ["439720a4.e86078"]
+    ["d03d98b6.aed2"],
+    ["c89068f7.fd1aa8"]
   ]
 }, {
   "id": "885e3b.9c6e91c8",
@@ -125,7 +125,7 @@
   "z": "d011e418.3e4ce8",
   "name": "barel",
   "group": "31dbe66f.a1c39a",
-  "order": 1,
+  "order": 7,
   "width": 0,
   "height": 0,
   "gtype": "wave",
@@ -137,8 +137,8 @@
   "colors": ["#00b500", "#e6e600", "#ca3838"],
   "seg1": "",
   "seg2": "",
-  "x": 1110,
-  "y": 260,
+  "x": 1090,
+  "y": 300,
   "wires": []
 }, {
   "id": "163a90f1.4affd7",
@@ -146,12 +146,12 @@
   "z": "d011e418.3e4ce8",
   "name": "refil",
   "group": "31dbe66f.a1c39a",
-  "order": 2,
+  "order": 6,
   "width": 0,
   "height": 0,
   "passthru": false,
   "label": "refil",
-  "tooltip": "Press after Barel refil",
+  "tooltip": "Press when Barel was filled up",
   "color": "white",
   "bgcolor": "blue",
   "icon": "",
@@ -159,16 +159,16 @@
   "payloadType": "num",
   "topic": "refil",
   "x": 690,
-  "y": 220,
+  "y": 180,
   "wires": [
-    ["d03d98b6.aed2"]
+    ["d03d98b6.aed2", "229298da.c83cd"]
   ]
 }, {
   "id": "d03d98b6.aed2",
   "type": "function",
   "z": "d011e418.3e4ce8",
   "name": "water counter",
-  "func": "var count=context.get('count') || 0;\nif (msg.topic == \"refil\") {\n    count=msg.payload;\n} else {\n    count -= msg.payload*0.1;\n    count=(count < 0)?0:count;\n}\nmsg.payload=count;\ncontext.set('count',count);\nreturn msg;",
+  "func": "var count=context.get('count') || 0;\nif (msg.topic == \"refil\") {\n    count=msg.payload;\n} else {\n    count -= msg.payload*0.3;\n    count=(count < 0)?0:count;\n}\nmsg.payload=count;\ncontext.set('count',count);\nreturn msg;",
   "outputs": 1,
   "noerr": 0,
   "x": 920,
@@ -180,9 +180,9 @@
   "id": "b4598f24.9ac8d8",
   "type": "ui_gauge",
   "z": "d011e418.3e4ce8",
-  "name": "moist",
-  "group": "fa8a91cd.256f3",
-  "order": 4,
+  "name": "moist gauge",
+  "group": "2e4dca71.85856e",
+  "order": 2,
   "width": 0,
   "height": 0,
   "gtype": "gage",
@@ -191,10 +191,10 @@
   "format": "{{value}}",
   "min": "0",
   "max": "100",
-  "colors": ["#0000ff", "#00ac00", "#ff0000"],
+  "colors": ["#ff0000", "#00ac00", "#0000ff"],
   "seg1": "",
   "seg2": "",
-  "x": 690,
+  "x": 710,
   "y": 500,
   "wires": []
 }, {
@@ -220,7 +220,7 @@
   "qos": "2",
   "datatype": "auto",
   "broker": "243fb1ae.c79226",
-  "x": 150,
+  "x": 170,
   "y": 620,
   "wires": [
     ["7647e839.b279c8", "b0fe9911.1b5b08"]
@@ -229,12 +229,12 @@
   "id": "7647e839.b279c8",
   "type": "ui_chart",
   "z": "d011e418.3e4ce8",
-  "name": "",
+  "name": "Temperature chart",
   "group": "fa8a91cd.256f3",
   "order": 2,
   "width": 0,
   "height": 0,
-  "label": "temperature",
+  "label": "Air temperature",
   "chartType": "line",
   "legend": "false",
   "xformat": "auto",
@@ -251,7 +251,7 @@
   "colors": ["#1f77b4", "#aec7e8", "#ff7f0e", "#2ca02c", "#98df8a", "#d62728", "#ff9896", "#9467bd", "#c5b0d5"],
   "useOldStyle": false,
   "outputs": 1,
-  "x": 710,
+  "x": 750,
   "y": 620,
   "wires": [
     []
@@ -266,9 +266,9 @@
   "datatype": "auto",
   "broker": "243fb1ae.c79226",
   "x": 140,
-  "y": 740,
+  "y": 780,
   "wires": [
-    ["6a24247.046025c"]
+    ["6a24247.046025c", "538edbd6.f07004"]
   ]
 }, {
   "id": "6a24247.046025c",
@@ -276,11 +276,11 @@
   "z": "d011e418.3e4ce8",
   "name": "current Humidity",
   "group": "fa8a91cd.256f3",
-  "order": 6,
+  "order": 3,
   "width": 0,
   "height": 0,
   "gtype": "gage",
-  "title": "relative Humidity",
+  "title": "Hygrometer",
   "label": "%",
   "format": "{{value}}",
   "min": 0,
@@ -289,7 +289,7 @@
   "seg1": "",
   "seg2": "",
   "x": 730,
-  "y": 740,
+  "y": 780,
   "wires": []
 }, {
   "id": "cdde0d35.103b5",
@@ -297,38 +297,23 @@
   "z": "d011e418.3e4ce8",
   "minin": "430",
   "maxin": "816",
-  "minout": "2",
-  "maxout": "100",
+  "minout": "98",
+  "maxout": "2",
   "action": "clamp",
   "round": true,
   "property": "payload",
   "name": "moist2percent",
   "x": 480,
-  "y": 500,
+  "y": 480,
   "wires": [
-    ["b4598f24.9ac8d8"]
+    ["b4598f24.9ac8d8", "bee4a7e5.ffe05", "95e466b0.874e88"]
   ]
-}, {
-  "id": "8a6f579b.8eca18",
-  "type": "ui_text",
-  "z": "d011e418.3e4ce8",
-  "group": "31dbe66f.a1c39a",
-  "order": 4,
-  "width": 0,
-  "height": 0,
-  "name": "",
-  "label": "",
-  "format": "{{msg.payload}}",
-  "layout": "col-center",
-  "x": 1110,
-  "y": 360,
-  "wires": []
 }, {
   "id": "439720a4.e86078",
   "type": "simpletime",
   "z": "d011e418.3e4ce8",
   "name": "",
-  "x": 710,
+  "x": 890,
   "y": 360,
   "wires": [
     ["6b35723a.7331b4"]
@@ -342,7 +327,7 @@
     "t": "set",
     "p": "payload",
     "pt": "msg",
-    "to": "$.payload & \" at \" \t& $.myyear & \"-\" \t& $formatInteger($.mymonthn,'00') & \"-\" \t& $formatInteger($.mydom,'00') & \" \" \t& $.mytime",
+    "to": "$.myyear & \"-\" \t& $formatInteger($.mymonthn,'00') & \"-\" \t& $formatInteger($.mydom,'00') & \" \" \t& $.mytime\t& \" \" & $.payload",
     "tot": "jsonata"
   }],
   "action": "",
@@ -350,10 +335,10 @@
   "from": "",
   "to": "",
   "reg": false,
-  "x": 910,
+  "x": 1070,
   "y": 360,
   "wires": [
-    ["8a6f579b.8eca18"]
+    ["b7c39563.01af"]
   ]
 }, {
   "id": "5354ebf2.741cac",
@@ -361,14 +346,14 @@
   "z": "d011e418.3e4ce8",
   "name": "Manual override",
   "label": "Manual On/Off",
-  "tooltip": "",
+  "tooltip": "max ON time is predefined watering time",
   "group": "31dbe66f.a1c39a",
-  "order": 5,
+  "order": 1,
   "width": 0,
   "height": 0,
   "passthru": true,
   "decouple": "false",
-  "topic": "switch/Watering/pump",
+  "topic": "",
   "style": "",
   "onvalue": "on",
   "onvalueType": "str",
@@ -378,8 +363,8 @@
   "offvalueType": "str",
   "officon": "",
   "offcolor": "",
-  "x": 140,
-  "y": 280,
+  "x": 340,
+  "y": 160,
   "wires": [
     ["a625b7a5.9d071"]
   ]
@@ -394,14 +379,14 @@
   "tostatus": false,
   "complete": "true",
   "targetType": "full",
-  "x": 690,
-  "y": 300,
+  "x": 1350,
+  "y": 580,
   "wires": []
 }, {
   "id": "273e85cb.c5822a",
   "type": "comment",
   "z": "d011e418.3e4ce8",
-  "name": "Sensors",
+  "name": "Soil moist",
   "info": "",
   "x": 120,
   "y": 460,
@@ -410,25 +395,25 @@
   "id": "867c63fc.5f2dc",
   "type": "comment",
   "z": "d011e418.3e4ce8",
-  "name": "Main",
+  "name": "Control",
   "info": "",
   "x": 110,
-  "y": 60,
+  "y": 100,
   "wires": []
 }, {
   "id": "4aa2af67.9183f8",
   "type": "ui_text",
   "z": "d011e418.3e4ce8",
-  "group": "fa8a91cd.256f3",
+  "group": "31dbe66f.a1c39a",
   "order": 5,
   "width": 0,
   "height": 0,
   "name": "",
   "label": "DHT Status",
   "format": "<font color={{msg.color}} ><i class=\"fa fa-circle\" style=\"font-size:24px;\"></i></font>",
-  "layout": "row-center",
-  "x": 790,
-  "y": 820,
+  "layout": "row-left",
+  "x": 750,
+  "y": 860,
   "wires": [],
   "icon": "node-red-contrib-ui-led/led.png"
 }, {
@@ -439,8 +424,8 @@
   "func": "switch(msg.payload) {\n  case \"OK\":\n    // Glow GREEN\n    msg.color = \"lime\";\n    break;\n  default:\n    // Glow RED\n    msg.color = \"red\";\n} \n\nreturn msg;",
   "outputs": 1,
   "noerr": 0,
-  "x": 570,
-  "y": 820,
+  "x": 530,
+  "y": 860,
   "wires": [
     ["4aa2af67.9183f8"]
   ]
@@ -453,8 +438,8 @@
   "qos": "0",
   "datatype": "utf8",
   "broker": "243fb1ae.c79226",
-  "x": 130,
-  "y": 820,
+  "x": 90,
+  "y": 860,
   "wires": [
     ["e6b95fa0.972388"]
   ]
@@ -476,16 +461,16 @@
   "id": "a7b76f50.bc5768",
   "type": "ui_text",
   "z": "d011e418.3e4ce8",
-  "group": "fa8a91cd.256f3",
-  "order": 3,
+  "group": "31dbe66f.a1c39a",
+  "order": 4,
   "width": 0,
   "height": 0,
   "name": "",
   "label": "moist Status",
   "format": "<font color={{msg.color}} ><i class=\"fa fa-circle\" style=\"font-size:24px;\"></i></font>",
-  "layout": "row-center",
+  "layout": "row-left",
   "x": 710,
-  "y": 560,
+  "y": 540,
   "wires": [],
   "icon": "node-red-contrib-ui-led/led.png"
 }, {
@@ -497,7 +482,7 @@
   "outputs": 1,
   "noerr": 0,
   "x": 490,
-  "y": 560,
+  "y": 540,
   "wires": [
     ["a7b76f50.bc5768"]
   ]
@@ -510,8 +495,8 @@
   "duration": "70",
   "units": "s",
   "name": "DHT WDT",
-  "x": 320,
-  "y": 820,
+  "x": 280,
+  "y": 860,
   "wires": [
     ["f721ae3a.eae6d8"]
   ]
@@ -521,7 +506,7 @@
   "z": "d011e418.3e4ce8",
   "name": "current Temperature",
   "group": "fa8a91cd.256f3",
-  "order": 5,
+  "order": 1,
   "width": 0,
   "height": 0,
   "gtype": "gage",
@@ -533,7 +518,7 @@
   "colors": ["#0000ff", "#00ac00", "#ff0000"],
   "seg1": "",
   "seg2": "",
-  "x": 740,
+  "x": 760,
   "y": 680,
   "wires": []
 }, {
@@ -545,10 +530,10 @@
   "qos": "0",
   "datatype": "utf8",
   "broker": "243fb1ae.c79226",
-  "x": 140,
-  "y": 400,
+  "x": 120,
+  "y": 340,
   "wires": [
-    ["764e7e21.d4bc3"]
+    ["764e7e21.d4bc3", "a9e69ce0.ff451"]
   ]
 }, {
   "id": "44f20127.317d8",
@@ -559,11 +544,11 @@
   "width": 0,
   "height": 0,
   "name": "",
-  "label": "Relay",
+  "label": "Pump ON",
   "format": "<font color={{msg.color}} ><i class=\"fa fa-circle\" style=\"font-size:24px;\"></i></font>",
   "layout": "row-left",
-  "x": 760,
-  "y": 400,
+  "x": 340,
+  "y": 340,
   "wires": [],
   "icon": "node-red-contrib-ui-led/led.png"
 }, {
@@ -574,10 +559,288 @@
   "func": "switch(msg.payload) {\n  case \"ON\":\n    // Glow GREEN\n    msg.color = \"lime\";\n    break;\n  default:\n    // Glow RED\n    msg.color = \"gray\";\n} \n\nreturn msg;",
   "outputs": 1,
   "noerr": 0,
-  "x": 560,
+  "x": 230,
   "y": 400,
   "wires": [
     ["44f20127.317d8"]
+  ]
+}, {
+  "id": "aeff4f.0c9b20b",
+  "type": "comment",
+  "z": "d011e418.3e4ce8",
+  "name": "Air temperature",
+  "info": "",
+  "x": 160,
+  "y": 580,
+  "wires": []
+}, {
+  "id": "538edbd6.f07004",
+  "type": "ui_chart",
+  "z": "d011e418.3e4ce8",
+  "name": "Humidity chart",
+  "group": "fa8a91cd.256f3",
+  "order": 4,
+  "width": 0,
+  "height": 0,
+  "label": "",
+  "chartType": "line",
+  "legend": "false",
+  "xformat": "auto",
+  "interpolate": "linear",
+  "nodata": "",
+  "dot": false,
+  "ymin": "10",
+  "ymax": "90",
+  "removeOlder": "4",
+  "removeOlderPoints": "",
+  "removeOlderUnit": "604800",
+  "cutout": 0,
+  "useOneColor": false,
+  "colors": ["#1f77b4", "#aec7e8", "#ff7f0e", "#2ca02c", "#98df8a", "#d62728", "#ff9896", "#9467bd", "#c5b0d5"],
+  "useOldStyle": false,
+  "outputs": 1,
+  "x": 750,
+  "y": 740,
+  "wires": [
+    []
+  ]
+}, {
+  "id": "bee4a7e5.ffe05",
+  "type": "ui_chart",
+  "z": "d011e418.3e4ce8",
+  "name": "soil moist chart",
+  "group": "2e4dca71.85856e",
+  "order": 7,
+  "width": 0,
+  "height": 0,
+  "label": "",
+  "chartType": "line",
+  "legend": "false",
+  "xformat": "auto",
+  "interpolate": "linear",
+  "nodata": "",
+  "dot": false,
+  "ymin": "0",
+  "ymax": "100",
+  "removeOlder": "4",
+  "removeOlderPoints": "",
+  "removeOlderUnit": "604800",
+  "cutout": 0,
+  "useOneColor": false,
+  "colors": ["#1f77b4", "#aec7e8", "#ff7f0e", "#2ca02c", "#98df8a", "#d62728", "#ff9896", "#9467bd", "#c5b0d5"],
+  "useOldStyle": false,
+  "outputs": 1,
+  "x": 720,
+  "y": 460,
+  "wires": [
+    []
+  ]
+}, {
+  "id": "2f504c69.12ed54",
+  "type": "comment",
+  "z": "d011e418.3e4ce8",
+  "name": "Hygrometer",
+  "info": "",
+  "x": 130,
+  "y": 720,
+  "wires": []
+}, {
+  "id": "bcb64efb.0e54d8",
+  "type": "ui_template",
+  "z": "d011e418.3e4ce8",
+  "group": "31dbe66f.a1c39a",
+  "name": "running log",
+  "order": 8,
+  "width": 0,
+  "height": 0,
+  "format": "<textarea rows=\"12\" cols=\"40\" style=\"color:back;background-color:white\" readonly>\n{{msg.payload}}\n</textarea>\n",
+  "storeOutMessages": false,
+  "fwdInMessages": true,
+  "templateScope": "local",
+  "x": 1550,
+  "y": 280,
+  "wires": [
+    []
+  ]
+}, {
+  "id": "b7c39563.01af",
+  "type": "file",
+  "z": "d011e418.3e4ce8",
+  "name": "Write to /config/watering.log",
+  "filename": "/config/watering.log",
+  "appendNewline": true,
+  "createDir": false,
+  "overwriteFile": "false",
+  "encoding": "ascii",
+  "x": 1300,
+  "y": 360,
+  "wires": [
+    ["f69f6b5b.d9e24"]
+  ]
+}, {
+  "id": "f69f6b5b.d9e24",
+  "type": "file in",
+  "z": "d011e418.3e4ce8",
+  "name": "",
+  "filename": "/config/watering.log",
+  "format": "utf8",
+  "chunk": false,
+  "sendError": false,
+  "encoding": "none",
+  "x": 1330,
+  "y": 240,
+  "wires": [
+    ["bcb64efb.0e54d8"]
+  ]
+}, {
+  "id": "504ecc88.6ead54",
+  "type": "file",
+  "z": "d011e418.3e4ce8",
+  "name": "erase watering.log",
+  "filename": "/config/watering.log",
+  "appendNewline": true,
+  "createDir": false,
+  "overwriteFile": "true",
+  "encoding": "none",
+  "x": 1250,
+  "y": 140,
+  "wires": [
+    ["f69f6b5b.d9e24"]
+  ]
+}, {
+  "id": "e61988bc.4fc3a8",
+  "type": "change",
+  "z": "d011e418.3e4ce8",
+  "name": "format refilled",
+  "rules": [{
+    "t": "set",
+    "p": "payload",
+    "pt": "msg",
+    "to": "$.myyear & \"-\" \t& $formatInteger($.mymonthn,'00') & \"-\" \t& $formatInteger($.mydom,'00') & \" \" \t& $.mytime\t& \" refilled\"",
+    "tot": "jsonata"
+  }],
+  "action": "",
+  "property": "",
+  "from": "",
+  "to": "",
+  "reg": false,
+  "x": 1040,
+  "y": 140,
+  "wires": [
+    ["504ecc88.6ead54"]
+  ]
+}, {
+  "id": "229298da.c83cd",
+  "type": "simpletime",
+  "z": "d011e418.3e4ce8",
+  "name": "",
+  "x": 850,
+  "y": 160,
+  "wires": [
+    ["e61988bc.4fc3a8"]
+  ]
+}, {
+  "id": "a9e69ce0.ff451",
+  "type": "switch",
+  "z": "d011e418.3e4ce8",
+  "name": "filter OFF",
+  "property": "payload",
+  "propertyType": "msg",
+  "rules": [{
+    "t": "eq",
+    "v": "OFF",
+    "vt": "str"
+  }],
+  "checkall": "false",
+  "repair": false,
+  "outputs": 1,
+  "x": 120,
+  "y": 280,
+  "wires": [
+    ["47b9dae2.671be4"]
+  ]
+}, {
+  "id": "47b9dae2.671be4",
+  "type": "change",
+  "z": "d011e418.3e4ce8",
+  "name": "s/OFF/default/",
+  "rules": [{
+    "t": "change",
+    "p": "payload",
+    "pt": "msg",
+    "from": "OFF",
+    "fromt": "str",
+    "to": "default",
+    "tot": "str"
+  }],
+  "action": "",
+  "property": "",
+  "from": "",
+  "to": "",
+  "reg": false,
+  "x": 220,
+  "y": 220,
+  "wires": [
+    ["5354ebf2.741cac"]
+  ]
+}, {
+  "id": "95e466b0.874e88",
+  "type": "function",
+  "z": "d011e418.3e4ce8",
+  "name": "stop when moist > 70%",
+  "func": "if (msg.payload > 70) {\n    msg.payload = \"manual\";\n    msg.color = \"red\";\n} else {\n    msg.payload = \"auto\";\n    msg.color = \"gray\";\n}\nreturn msg;",
+  "outputs": 1,
+  "noerr": 0,
+  "x": 450,
+  "y": 420,
+  "wires": [
+    ["5b97afc4.dddfc", "c89068f7.fd1aa8", "f801106c.de7e18"]
+  ]
+}, {
+  "id": "c89068f7.fd1aa8",
+  "type": "rbe",
+  "z": "d011e418.3e4ce8",
+  "name": "",
+  "func": "rbe",
+  "gap": "",
+  "start": "",
+  "inout": "out",
+  "property": "payload",
+  "x": 730,
+  "y": 360,
+  "wires": [
+    ["439720a4.e86078"]
+  ]
+}, {
+  "id": "5b97afc4.dddfc",
+  "type": "ui_text",
+  "z": "d011e418.3e4ce8",
+  "group": "31dbe66f.a1c39a",
+  "order": 2,
+  "width": 0,
+  "height": 0,
+  "name": "",
+  "label": "Watering blocked",
+  "format": "<font color={{msg.color}} ><i class=\"fa fa-circle\" style=\"font-size:24px;\"></i></font>",
+  "layout": "row-left",
+  "x": 730,
+  "y": 420,
+  "wires": [],
+  "icon": "node-red-contrib-ui-led/led.png"
+}, {
+  "id": "f801106c.de7e18",
+  "type": "rbe",
+  "z": "d011e418.3e4ce8",
+  "name": "",
+  "func": "rbe",
+  "gap": "",
+  "start": "",
+  "inout": "out",
+  "property": "payload",
+  "x": 490,
+  "y": 340,
+  "wires": [
+    ["a625b7a5.9d071"]
   ]
 }, {
   "id": "243fb1ae.c79226",
@@ -604,20 +867,30 @@
   "id": "31dbe66f.a1c39a",
   "type": "ui_group",
   "z": "",
-  "name": "Main",
+  "name": "Control",
   "tab": "82b6846f.3524c8",
   "disp": true,
   "width": "6",
-  "collapse": false
+  "collapse": true
+}, {
+  "id": "2e4dca71.85856e",
+  "type": "ui_group",
+  "z": "",
+  "name": "Soil",
+  "tab": "82b6846f.3524c8",
+  "order": 3,
+  "disp": true,
+  "width": "6",
+  "collapse": true
 }, {
   "id": "fa8a91cd.256f3",
   "type": "ui_group",
   "z": "",
-  "name": "Sensors",
+  "name": "Air",
   "tab": "82b6846f.3524c8",
   "disp": true,
   "width": "6",
-  "collapse": false
+  "collapse": true
 }, {
   "id": "82b6846f.3524c8",
   "type": "ui_tab",
